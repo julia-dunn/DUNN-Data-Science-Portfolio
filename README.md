@@ -1,2 +1,3 @@
 # DUNN-Data-Science-Portfolio
-Code and projects for Introduction to Data Sceince
+
+## Major: Physics (concentration in advanced physics)
