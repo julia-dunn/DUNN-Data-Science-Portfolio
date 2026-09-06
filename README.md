@@ -8,7 +8,7 @@ Organization/outline:
 ## Projects
 
 ### Project 1 (with image)
-Description:
-TLDR:
-Technical skills:
-Soft skills:
+- Description:
+- TLDR:
+- Technical skills:
+- Soft skills:
