@@ -5,7 +5,7 @@ st.title('Hello Streamlit') # this is the same as one # in markdown syntax
 st.write("This is my first Streamlit app.")
 
 if st.button('Click me!'):
-    st.write('🎉 You clicked the button! Nice work! 🚀')
+    st.write('You clicked the button! Nice work!')
 else:
     st.write("Click the button to see what happens...")
 
@@ -14,7 +14,7 @@ st.write(f"You picked: {color}")
 
 st.subheader("Exploring our Dataset")
 
-# load the CSV file
+# load the CSV file, from week-02 folder
 
 df = pd.read_csv('data_3/sample_data-1.csv')
 
@@ -24,7 +24,9 @@ st.dataframe(df)
 # Filter
 
 city = st.selectbox("select a city", df['City'].unique())
-filtered_df = df[df['City'] == city]
+filtered_df = df[df['City'] == city] # boolean masking
 
 st.write(f"People in {city}:")
 st.dataframe(filtered_df)
+
+st.bar_chart(df["Salary"])
