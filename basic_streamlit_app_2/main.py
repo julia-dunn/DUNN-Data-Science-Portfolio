@@ -19,7 +19,7 @@ with title:
 
 st.markdown("Use this app to learn about a huge variety of songs on spotify. Ask questions like 'What genre is the most dancable?' and 'What is the relationship between tempo and valence?' This is your chance to dive deep into the statistics behind your favorite songs. Enjoy! ")
 
-tab1, tab2, tab3, tab4 = st.tabs(['Home', 'Danceability', 'Explicitness', 'Key'])
+tab1, tab2, tab3, tab4 = st.tabs(['Home', 'Artist', 'Danceability', 'Key'])
 
 with tab1:
 
@@ -30,7 +30,7 @@ with tab1:
     st.markdown("### Let's Explore!")
     st.markdown("Use these selectors and sliders to learn about different trends. What do you notice?")
     # select a genre to filter the dataset 
-
+    st.markdown('###### Here you can see how the genre distribution changes for individual genres.')
     genre = st.selectbox('Genre',df['track_genre'].unique())
     df_filtered = df[df['track_genre'] == genre]
 
@@ -47,7 +47,7 @@ with tab1:
         # display statistical summary for the selected column
         st.write(df['popularity'].describe())
 
-    # Cleaned Data Visualization
+    # Filtered Genre Data Visualization
     with col2:
         st.subheader(f'{genre} Data Distrubution')
         # plot a histogram with KDE for selected column from original database (kernal density estimation)
@@ -59,6 +59,30 @@ with tab1:
         # display statistical summary for the selected column
         st.write(df_filtered['popularity'].describe())
 
+    st.markdown('###### Here you can compare these different numarical metrics and their trends across different keys')
+    # filtered by key
+    keys_conversion = {
+        0:'C', 1:'C-s/D-f', 2:'D', 3:'D-s/E-f', 4:'E', 5: 'F', 
+        6:'F-s/G-d', 7:'G', 8: 'G-s/A-f', 9:'A', 10:'A-s/B-f', 11:'B'
+    }
+
+    df['key_name'] = df['key'].map(keys_conversion)
+    key_order = [keys_conversion[i] for i in range(11)]
+
+    unique_keys = list(sorted(df['key'].unique()))
+
+    selected_key = st.radio(
+        'Numerical Comparison',
+        options = ['speechiness', 'energy', 'acousticness']
+    )
+    fig3, ax3 = plt.subplots()    
+    sns.violinplot(data=df, x = selected_key, y = 'key_name',order = key_order, ax = ax3, palette = 'muted')
+    plt.title(f'{selected_key} vs Key')
+    st.pyplot(fig3)
+
+    st.write("To learn more about how the trends in data relate to the key the song is written in, click the 'Key' tab!")
+
+    # filtered by duration
     min_duration = df['duration_ms'].min()
     max_duration = df['duration_ms'].max()
 
@@ -79,10 +103,10 @@ with tab1:
     with col3:
         st.subheader('Full Data Distrubution')
         # plot a histogram with KDE for selected column from original database (kernal density estimation)
-        fig1, ax1 = plt.subplots(figsize=(5, 3.5))
-        sns.histplot(df['danceability'], kde=True, ax=ax1)
+        fig4, ax4 = plt.subplots(figsize=(5, 3.5))
+        sns.histplot(df['danceability'], kde=True, ax=ax4)
         plt.title(f'Original Distribution of')
-        st.pyplot(fig1)
+        st.pyplot(fig4)
         st.subheader(f"Original Status")
         # display statistical summary for the selected column
         st.write(df['danceability'].describe())
@@ -91,10 +115,31 @@ with tab1:
     with col4:
         st.subheader('Data Distrubution within range')
         # plot a histogram with KDE for selected column from original database (kernal density estimation)
-        fig2, ax2 = plt.subplots(figsize=(5, 3.5))
-        sns.histplot(df_filtered_2['danceability'], kde=True, ax=ax2)
+        fig5, ax5 = plt.subplots(figsize=(5, 3.5))
+        sns.histplot(df_filtered_2['danceability'], kde=True, ax=ax5)
         plt.title(f'Data Distribution within Range')
-        st.pyplot(fig2)
+        st.pyplot(fig5)
         st.subheader(f"Status within Range")
         # display statistical summary for the selected column
         st.write(df_filtered_2['danceability'].describe())
+
+    with tab2:
+        st.write('Here, you can search for a specific artist! See how they compare to the entire dataset with respect to popularity, danceability, energy, explicitness, loudness, speechiness, acousticness, instrumentalness, liveness, and valence.')
+
+        search = st.text_input("What artist do you want to learn more about?", placeholder= 'Search for artist here')
+
+        if search:
+            filtered_df_4 = df[df['artists'].str.contains(search, case=False, na=False)]
+            st.dataframe(filtered_df_4)
+
+            def convert_df_to_means(df):
+                means = df[features].mean()
+                means['explicit']=means['explicit'] * 100 # makes percentage 
+
+            features = [
+                'popularity','danceability', 'energy', 'explicit',
+                'loudness', 'speechiness', 'acousticness',
+                'instrumentalness', 'livenes', 'valence'
+            ]
+        else: 
+            st.markdown('### Search for data visualizations to appear!')
