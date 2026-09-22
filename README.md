@@ -7,8 +7,6 @@ The goal for this portfolio is to house the comprehensive data science projects 
 Organization/outline:
 ## Projects
 
-### Project 1 (with image)
-- Description:
-- TLDR:
-- Technical skills:
-- Soft skills:
+### What is there to listen to on Spotify?
+- Description: This app is essentially an exploratory data analytics dashboard, where you can learn about important relationships between numerical and categorical variables. Here, we explore a dataset of over 100,000 songs on spotify. Check out this user-interactive platform and generate visualizations yourself!
+- Technical skills: Pandas, Matplotlib, Seaborn, Streamlit
