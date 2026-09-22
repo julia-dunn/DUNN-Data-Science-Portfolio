@@ -18,12 +18,12 @@ with logo:
 with title:
     st.title("What is there to listen to on Spotify?")
 
-st.markdown("Use this app to learn about a huge variety of songs on spotify. Ask questions like 'What genre is the most dancable?' and 'What is the relationship between tempo and valence?' This is your chance to dive deep into the statistics behind your favorite songs. Enjoy! ")
-
-tab1, tab2, tab3, tab4 = st.tabs(['Home', 'Artist', 'Danceability', 'Key'])
+st.write("Use this app to learn about a huge variety of songs on spotify. Ask questions like 'What genre is the most dancable?' and 'What is the relationship between tempo and valence?' This is your chance to dive deep into the statistics behind your favorite songs. Enjoy! ")
+st.write('This app is essentially an exploratory data analytics dashboard, where you can learn about important relationships between numerical and categorical variables. Here, we explore a dataset of over 100,000 songs on spotify. Check out this user-interactive platform and generate visualizations yourself!')
+st.dataframe(df.head())
+tab1, tab2, tab3 = st.tabs(['Home', 'Artist', 'Danceability'])
 
 with tab1:
-
     st.write('### Summary Statistics of Spotify Dataset:')
     st.dataframe(df.describe())
     # the summary statistics of the dataset demonstrates that there is no missing data, because all of the counts are the same number, 114,000
@@ -41,10 +41,10 @@ with tab1:
         st.subheader('Full Data Distrubution')
         # plot a histogram with KDE for selected column from original database (kernal density estimation)
         fig1, ax1 = plt.subplots(figsize=(5, 3.5))
-        sns.histplot(df['popularity'], kde=True, ax=ax1)
-        plt.title(f'Original Distribution of')
+        sns.histplot(df['popularity'], kde=True, ax=ax1, color = 'gray')
+        plt.title(f'Popularity Distribution of Full Dataset')
         st.pyplot(fig1)
-        st.subheader(f"Original Status")
+        st.subheader(f"Original Summary Stats")
         # display statistical summary for the selected column
         st.write(df['popularity'].describe())
 
@@ -53,10 +53,10 @@ with tab1:
         st.subheader(f'{genre} Data Distrubution')
         # plot a histogram with KDE for selected column from original database (kernal density estimation)
         fig2, ax2 = plt.subplots(figsize=(5, 3.5))
-        sns.histplot(df_filtered['popularity'], kde=True, ax=ax2)
-        plt.title(f'Cleaned Distribution of {genre}')
+        sns.histplot(df_filtered['popularity'], kde=True, ax=ax2, color='green')
+        plt.title(f'Popularity Distrubution of {genre} songs')
         st.pyplot(fig2)
-        st.subheader(f"{genre}'s Cleaned Status")
+        st.subheader(f"{genre}'s Summary Stats")
         # display statistical summary for the selected column
         st.write(df_filtered['popularity'].describe())
 
@@ -79,11 +79,9 @@ with tab1:
     )
     # create a boxplot plot of the different numerical values by key
     fig3, ax3 = plt.subplots()    
-    sns.boxplot(data=df, x = selected_key, y = 'key_name',order = key_order, ax = ax3, palette = 'muted')
+    sns.boxplot(data=df, x = selected_key, y = 'key_name',order = key_order, ax = ax3, color="#78B078")
     plt.title(f'{selected_key} vs Key')
     st.pyplot(fig3)
-
-    st.write("To learn more about how the trends in data relate to the key the song is written in, click the 'Key' tab!")
 
     # filtered by duration
     min_duration = df['duration_ms'].min()
@@ -107,8 +105,8 @@ with tab1:
         st.subheader('Full Data Distrubution')
         # plot a histogram with KDE for selected column from original database (kernal density estimation)
         fig4, ax4 = plt.subplots(figsize=(5, 3.5))
-        sns.histplot(df['danceability'], kde=True, ax=ax4)
-        plt.title(f'Original Distribution of')
+        sns.histplot(df['danceability'], kde=True, ax=ax4, color = 'gray')
+        plt.title(f'Danceability Distribution of Full Dataset')
         st.pyplot(fig4)
         st.subheader(f"Original Status")
         # display statistical summary for the selected column
@@ -116,11 +114,11 @@ with tab1:
 
     # Cleaned Data Visualization
     with col4:
-        st.subheader('Data Distrubution within range')
+        st.subheader('Distrubution within Range')
         # plot a histogram with KDE for selected column from original database (kernal density estimation)
         fig5, ax5 = plt.subplots(figsize=(5, 3.5))
-        sns.histplot(df_filtered_2['danceability'], kde=True, ax=ax5)
-        plt.title(f'Data Distribution within Range')
+        sns.histplot(df_filtered_2['danceability'], kde=True, ax=ax5, color='green')
+        plt.title(f'Danceability Distribution within Range')
         st.pyplot(fig5)
         st.subheader(f"Status within Range")
         # display statistical summary for the selected column
@@ -171,20 +169,13 @@ with tab1:
         st.write('Select genres to compare:')
 
         genres=df['track_genre'].unique()
-        selected_genres = []
-
-        columns = st.columns(7)
-        for i, genre in enumerate(genres):
-            column = columns[i % 7]
-            with column:
-                if st.checkbox(genre):
-                    selected_genres.append(genre)
+        selected_genres = st.multiselect('Select genres to compare:', genres, default = ['acoustic', 'rock', 'party', 'punk','latin'])
 
         df_filtered_5 = df[df['track_genre'].isin(selected_genres)] 
         genre_danceability = (df_filtered_5.groupby('track_genre')['danceability'].mean())
 
         fig, ax= plt.subplots()
-        plt.bar(genre_danceability.index, genre_danceability.values)
+        plt.bar(genre_danceability.index, genre_danceability.values, color = 'green')
         plt.xlabel("Genre")
         plt.ylabel('Average Danceability')
         plt.title('Average Danceability by Genre')
@@ -200,39 +191,23 @@ with tab1:
         key_danceability = (df.groupby('key_name')['danceability'].mean())
 
         fig, ax= plt.subplots()
-        plt.bar(key_danceability.index, key_danceability.values)
+        plt.bar(key_danceability.index, key_danceability.values, color = 'green')
         plt.xlabel("Key")
         plt.ylabel('Average Danceability')
         plt.title('Average Danceability by Key')
         
         st.pyplot(fig)
-        
-        fig, ax = plt.subplots()
+        st.write('As you can see in the heatmap below, there does not seem to be a strong correlation between danceability and the other numerical features. Perhaps a weak positive correlation between danceability and valence?')
+        correlation_df = df[['danceability', 'loudness', 'valence', 'tempo']]
+        correlation_matrix = correlation_df.corr()
 
-        plt.scatter(
-            df['loudness'],
-            df['danceability']
-        )
-        plt.xlabel('Loudness')
-        plt.ylabel('Danceability')
-        plt.title('Danceability vs Loudness')
+        fig = plt.figure()
 
-        # axes[1].violinplot(
-        #     df['valence'],
-        #     df['danceability']
-        # )
-        # axes[1].set_xlabel('Valence')
-        # axes[1].set_ylabel('Danceability')
-        # axes[1].set_title('Danceability vs Valence')
+        sns.heatmap(correlation_matrix,
+                    cmap='coolwarm',
+                    vmin=-1,
+                    vmax=1)
 
-        # axes[2].violinplot(
-        #     df['tempo'],
-        #     df['danceability']
-        # )
-        # axes[2].set_xlabel('Tempo')
-        # axes[2].set_ylabel('Danceability')
-        # axes[2].set_title('Danceability vs Tempo')
-
-        plt.tight_layout()
+        plt.title('Correlation Between Features of Songs')
 
         st.pyplot(fig)
