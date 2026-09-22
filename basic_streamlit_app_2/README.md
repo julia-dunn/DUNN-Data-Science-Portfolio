@@ -55,5 +55,4 @@ Then, to run the app locally, run this command in the integrated terminal.
     steamlit run main.py
 }
 ```
-
-### App Features:
+ 
