@@ -6,6 +6,6 @@ The goal for this portfolio is to house the comprehensive data science projects 
 
 ## Projects
 
-### What is there to listen to on Spotify?
+### [What is there to listen to on Spotify?](https://github.com/julia-dunn/DUNN-Data-Science-Portfolio/tree/main/basic_streamlit_app_2)
 - Description: This app is essentially an exploratory data analytics dashboard, where you can learn about important relationships between numerical and categorical variables. Here, we explore a dataset of over 100,000 songs on spotify. Check out this user-interactive platform and generate visualizations yourself!
 - Technical skills: Pandas, Matplotlib, Seaborn, Streamlit
