@@ -9,7 +9,7 @@ Use this app to learn about a huge variety of songs on spotify. Ask questions li
 This app is essentially an exploratory data analytics dashboard, where you can learn about important relationships between numerical and categorical variables. Here, we explore a dataset of over 100,000 songs on spotify. Check out this user-interactive platform and generate visualizations yourself!
 
 #### What's in the dataset:
-This dataset features over 100,000 songs. Each of which have the following features and variables:
+This dataset features over 100,000 songs, each of which have the following features and variables:
 - Track ID
 - Artists
 - Track name
@@ -29,8 +29,31 @@ This dataset features over 100,000 songs. Each of which have the following featu
 - Time signature
 - Track genre
 
-### How to use the app: 
+### Setup and Run Instructions: 
+There are a few required libraries for this app in order to run the necessary calculations. They are listed in the requirements file within the portfolio, and include:
 
-#### Requirements: 
+- Streamlit 1.63.0
+- Pandas 2.2.2
+- Matpltlib 3.9.2
+- Seaborn 0.13.2
+
+To install these libraries, run the following commands in your terminal: 
+
+```
+{
+    pip install streamlit
+    pip install pandas
+    pip install matplotlib
+    pip install seaborn
+}
+```
+
+Then, to run the app locally, run this command in the integrated terminal.
+
+```
+{
+    steamlit run main.py
+}
+```
 
 ### App Features:
