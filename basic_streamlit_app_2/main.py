@@ -7,7 +7,7 @@ import streamlit as st
 # loading the spotify dataset
 
 # loading the spotify dataset
-df = pd.read_csv("data/spotify_dataset.csv")
+df = pd.read_csv("basic_streamlit_app_2/data/spotify_dataset.csv")
 
 # creating heading of app with logo on the left
 logo, title = st.columns([1, 8], vertical_alignment="center")
