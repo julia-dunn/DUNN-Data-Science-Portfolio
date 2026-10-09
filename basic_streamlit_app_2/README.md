@@ -3,6 +3,8 @@
   <h1>What is there to listen to on Spotify?</h1>
 </div>
 
+## [Click here to view app](https://dunnspotifydataanalysis.streamlit.app/)
+
 ### Project Overview 
 Use this app to learn about a huge variety of songs on spotify. Ask questions like 'What genre is the most dancable?' and 'What is the relationship between tempo and valence?' This is your chance to dive deep into the statistics behind your favorite songs. Enjoy!
 
