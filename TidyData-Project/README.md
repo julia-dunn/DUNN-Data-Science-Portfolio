@@ -34,3 +34,22 @@ df_pivot1 = df_olymp_melted_tidy.pivot_table( # create a pivot table with the Sp
 ```
 With these pivot tables, and some additional calculations, I generated three visualizations which provide valuable insights into the data. Most notably, how the medal counts are distributed between gold, silver, and bronze medals for both male and female athletes.
 ![Example visualization](medal_counts_sex_rank.png)
+
+## Instructions
+To run this notebook, you must install and import several dictionaries which are later referred to. These include pandas, seaborn, and matplotlib.
+
+To install:
+```
+!pip install pandas
+!pip install seaborn
+!pip install matplotlib.pyplot
+```
+
+To import:
+```
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+```
+
+Once the above have been run in your terminal and script respectively, the notebook will be accessible and legible such that the visualizations and analysis are understood. 
