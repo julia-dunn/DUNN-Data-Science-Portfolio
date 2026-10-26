@@ -53,3 +53,16 @@ import matplotlib.pyplot as plt
 ```
 
 Once the above have been run in your terminal and script respectively, the notebook will be accessible and legible such that the visualizations and analysis are understood. 
+
+## Dataset Description
+
+
+## References
+- https://stackoverflow.com/questions/15891038/change-column-type-in-pandas
+- https://stackoverflow.com/questions/51004029/create-a-new-dataframe-based-on-rows-with-a-certain-value
+- https://github.com/julia-dunn/DUNN-Python-Portfolio/tree/main/TidyData-Project
+- https://pandas.pydata.org/docs/reference/api/pandas.crosstab.html
+- https://python-graph-gallery.com/scatter-plot/
+- https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.unstack.html
+- https://vita.had.co.nz/papers/tidy-data.pdf
+- https://pandas.pydata.org/Pandas_Cheat_Sheet.pdf
