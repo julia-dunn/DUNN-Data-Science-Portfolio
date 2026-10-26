@@ -55,7 +55,7 @@ import matplotlib.pyplot as plt
 Once the above have been run in your terminal and script respectively, the notebook will be accessible and legible such that the visualizations and analysis are understood. 
 
 ## Dataset Description
-
+This dataset contains all of the individual competitors from the 2008 Olympics who medaled, as well as their sex, sport, and which metal(s) they received. It is an adjusted csv file from author Giorgio Comai (original page linked [here](https://edjnet.github.io/OlympicsGoNUTS/2008/)).
 
 ## References
 - https://stackoverflow.com/questions/15891038/change-column-type-in-pandas
