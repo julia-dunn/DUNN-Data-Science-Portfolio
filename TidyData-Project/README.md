@@ -60,6 +60,7 @@ This dataset contains all of the individual competitors from the 2008 Olympics w
 Tidying this dataset was necessary to separate the information regarding sport and gender. Additionally, there was significant repitition and null values once the data was melted, which needed to be accounted for. This dataset included columns of 
 - Medalist name
 - sex_sport
+  
 where the type of medal (value) was indicated in each cell. This left excessive empty/null cells for each sex/sport a given medalist did not compete in. 
 
 ## References
