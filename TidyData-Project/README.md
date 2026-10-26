@@ -19,3 +19,18 @@ df_olymp_melted = pd.melt(df_olymp,
                           var_name = 'sex_sport', # renames the column now containing the previous column names
                           value_name='Medal') #names the column containing all of the values from the original untidy dataframe
 ```
+After tidying the data, I then created pivot tables to represent statistical information in a streamlined way.
+The first considers the total number of medals for each sport, as well as the distribution between sexes and medal rankings. 
+The second depicts the most common medal rank for both males and females within each sport. 
+
+Demonstration of pivot table construction:
+```
+df_pivot1 = df_olymp_melted_tidy.pivot_table( # create a pivot table with the Sport as the index
+    index='Sport',
+    columns = 'Sex',
+    values = 'Medal',
+    aggfunc=lambda x: x.mode() # agg function is the most earned medal (i.e. mode) for each sport
+)
+```
+With these pivot tables, and some additional calculations, I generated three visualizations which provide valuable insights into the data. Most notably, how the medal counts are distributed between gold, silver, and bronze medals for both male and female athletes.
+![Example visualization](medal_counts_sex_rank.png)
