@@ -38,8 +38,8 @@ with tab1:
         if toggle:
             file = st.file_uploader("Upload your CSV file", type="csv", key = 'user_upload')
         else:
-            file = st.radio('Choose an Example Dataset', list(example_datasets.keys()), horizontal = True)
-
+            selected_example = st.radio('Choose an Example Dataset', list(example_datasets.keys()), horizontal = True)
+            file = example_datasets[selected_example]
     if file is not None:
         dataframe = pd.read_csv(file)
 
