@@ -15,9 +15,10 @@ from sklearn.metrics import mean_squared_error, root_mean_squared_error, r2_scor
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, precision_score, f1_score, recall_score, confusion_matrix
+from statsmodels.graphics.gofplots import qqplot
 
 
-tab1, tab2, tab3 = st.tabs(['Selecting Dataset', 'Building and Evaluating Model', 'Diving Deeper'])
+tab1, tab2 = st.tabs(['Selecting Dataset', 'Building and Evaluating Model'])
 final_feat = []
 
 with tab1:
@@ -34,15 +35,23 @@ with tab1:
 
     if file is not None:
         dataframe = pd.read_csv(file)
-        cleaned_df = dataframe.dropna()
-        
+
+        missing_count = dataframe.isna().mean()
+        columns_kept = missing_count[missing_count <= 0.5].index.to_list()
+        columns_dropped = [c for c in dataframe.columns if c not in columns_kept]
+        working_df = dataframe[columns_kept]
+
         st.subheader('Dataset Overview')
+        cleaned_df = working_df.dropna()
 
         m1, m2, m3 = st.columns(3)
         m1.metric('Total Rows', f'{len(dataframe):,}')
-        m2.metric('Clean Rows (No NAs)', f'{len(cleaned_df):,}')
-        m3.metric('Columns', len(dataframe.columns))
+        m2.metric('Usable Complete Rows (No NAs)', f'{len(cleaned_df):,}')
+        m3.metric('Usable Columns', len(cleaned_df.columns))
 
+        if columns_dropped:
+            st.caption(f"Excluded sparse columns (>50% missing): {', '.join(columns_dropped)}")
+        
         with st.expander('Preview Raw Data'):
             st.dataframe(dataframe.head(), width='stretch')
 
@@ -109,7 +118,7 @@ with tab1:
         else:
             st.header("3. Encoding Categorical Variables", divider = 'gray')
             with st.container(border = True):
-                feat_encode = st.multiselect('Select which features are categorical, but can be numerically encoded',cleaned_df.drop(columns = [target]).columns.tolist())
+                feat_encode = st.multiselect('Select which features are categorical, but can be numerically encoded',cleaned_df.columns.tolist())
                 selected_feat = list(dict.fromkeys(num_feat + feat_encode))
                 encoded_df = cleaned_df[selected_feat]
                 encoding_maps = {}
@@ -147,11 +156,12 @@ with tab2:
             with st.container(border = True):
                 st.caption('In linear regression models, we can choose to scale the data, such that the coefficients of the final model represent the effect of one standard deviation change in the feature. We can also choose to include an intercept B_0, as opposed to fitting through the origin.')
                 X_selected = cleaned_df[final_feat]
-                X_train, X_test, y_train, y_test = train_test_split(X_selected, y, test_size = 0.2)
+                X_train, X_test, y_train, y_test = train_test_split(X_selected, y, test_size = 0.2, random_state = 42)
                 lin_reg_unsc = LinearRegression()
                 lin_reg_unsc.fit(X_train, y_train)
 
                 y_pred_unsc = lin_reg_unsc.predict(X_test)
+                residuals_unsc = y_test - y_pred_unsc
 
                 mse_unsc = mean_squared_error(y_test, y_pred_unsc)
                 rmse_unsc = root_mean_squared_error(y_test, y_pred_unsc)
@@ -169,19 +179,35 @@ with tab2:
                 m1.metric('Mean Squared Error', f'{mse_unsc:.4f}')
                 m2.metric('Root Mean Squared Error', f'{rmse_unsc:.4f}')
                 m3.metric('R2 Score', f'{r2_unsc:.4f}')
+
+                col1, col2 = st.columns(2)
+                with col1:
+                    fig1, ax1 = plt.subplots(figsize = (6, 4.5))
+                    ax1.hist(residuals_unsc, bins = 20, edgecolor = 'black', alpha = 0.7)
+                    ax1.set_xlabel('Residuals')
+                    ax1.set_ylabel('Frequency')
+                    ax1.set_title('Histogram of Residuals')
+                    st.pyplot(fig1)
+
+                with col2:
+                    fig2, ax2 = plt.subplots(figsize = (6, 4.5))
+                    qqplot(residuals_unsc, line ='s', ax=ax2)
+                    ax2.set_title('Q-Q Plot of Residuals')
+                    st.pyplot(fig2)
+
     else:
         if target:
             with st.container(border=True):
                 st.caption('In Logistic Regression, we can select for a few different types of hyperparameters. Primarily, we will focus on class weight and the maximum number of iterations. First we will build the default model.')
-                X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+                X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state = 42)
                 log_reg_default = LogisticRegression()
                 log_reg_default.fit(X_train, y_train)
 
-                y_pred = log_reg_default.predict(X_test)
-                accuracy = accuracy_score(y_test, y_pred)
-                precision = precision_score(y_test, y_pred)
-                recall = recall_score(y_test, y_pred)
-                f1 = f1_score(y_test, y_pred)
+                y_pred_def = log_reg_default.predict(X_test)
+                accuracy = accuracy_score(y_test, y_pred_def)
+                precision = precision_score(y_test, y_pred_def, average='weighted')
+                recall = recall_score(y_test, y_pred_def, average='weighted')
+                f1 = f1_score(y_test, y_pred_def, average='weighted')
 
                 st.subheader('Default Fit Metrics')
                 m1, m2, m3, m4 = st.columns(4)
@@ -193,79 +219,110 @@ with tab2:
 
                 st.subheader('Confusion Matrix for Default Model')
 
-                cm1 = confusion_matrix(y_test, y_pred)
+                cm1 = confusion_matrix(y_test, y_pred_def)
                 fig, ax = plt.subplots(figsize=(5,4))
                 sns.heatmap(cm1, annot=True, fmt='d', cmap='Blues')
                 ax.set_xlabel('Predicted')
                 ax.set_ylabel('Actual')
                 ax.set_title('Confusion Matrix')
                 st.pyplot(fig)
-
-
         else:
             st.warning('No target has been selected. Please navigate to the **Selecting Dataset**.')
-            
-    if models == 'Linear Regression':
-        st.header('2. Linear Regression Hyperparameters', divider = 'gray')
-        with st.container(border = True):
-            st.markdown('For your dataset, select if you want to scale the data (making the coefficients more readable), and if the intercept assumption should be eliminated (dependent on domain knowledge)')
-            toggle2 = st.toggle('I want to scale the data')
-            toggle3 = st.toggle('I want to fit through the origin')
+    if file is not None:        
+        if models == 'Linear Regression' and len(final_feat) > 0:
+            st.header('2. Linear Regression Hyperparameters', divider = 'gray')
+            with st.container(border = True):
+                st.markdown('For your dataset, select if you want to scale the data (making the coefficients more readable), and if the intercept assumption should be eliminated (dependent on domain knowledge)')
+                toggle2 = st.toggle('I want to scale the data')
+                toggle3 = st.toggle('I want to fit through the origin')
 
-            if toggle2: 
-                scaler = StandardScaler()
-                X_train_scaled = scaler.fit_transform(X_train)
-                X_test_scaled = scaler.transform(X_test)
+                if toggle2: 
+                    scaler = StandardScaler()
+                    X_train_mod = scaler.fit_transform(X_train)
+                    X_test_mod = scaler.transform(X_test)
 
-                learned = pd.DataFrame({
-                    "mu (training mean)": scaler.mean_,
-                    "sigma (training std)": scaler.scale_,
-                    }, index=final_feat)
-
-                st.dataframe(learned, width='stretch', hide_index = True)
-
-                if toggle3:
-                    lin_reg_scaled_origin = LinearRegression(fit_intercept = False)
-                    lin_reg_scaled_origin.fit(X_train_scaled, y_train)
-                    y_pred_scaled_origin = lin_reg_scaled_origin.predict(X_test_scaled)
-
-                    mse_scaled_origin  = mean_squared_error(y_test, y_pred_scaled_origin)
-                    rmse_scaled_origin = root_mean_squared_error(y_test, y_pred_scaled_origin)
-                    r2_scaled_origin   = r2_score(y_test, y_pred_scaled_origin)
-
-                    st.subheader('Scaled Model Coefficients')
-                    coef_df_sc_o = pd.DataFrame({
-                            "Feature": final_feat,
-                            "Coefficient": lin_reg_scaled_origin.coef_
-                        })
-                    st.dataframe(coef_df_sc_o, width='stretch', hide_index=True)
-        
-                    st.subheader('Scaled Fit Metrics')
-                    m1, m2, m3 = st.columns(3)
-                    m1.metric('Mean Squared Error', f'{mse_scaled_origin:.4f}')
-                    m2.metric('Root Mean Squared Error', f'{rmse_scaled_origin:.4f}')
-                    m3.metric('R2 Score', f'{r2_scaled_origin:.4f}')
-
+                    st.subheader("Learned Scaling Parameters")
+                    learned = pd.DataFrame({
+                        "Feature": final_feat,
+                        "mu (training mean)": scaler.mean_,
+                        "sigma (training std)": scaler.scale_,
+                    })
+                    st.dataframe(learned, width="stretch", hide_index=True)
                 else:
-                    lin_reg_scaled = LinearRegression()
-                    lin_reg_scaled.fit(X_train_scaled, y_train)
-                    y_pred_scaled = lin_reg_scaled.predict(X_test_scaled)
-                    
-                    mse_scaled  = mean_squared_error(y_test, y_pred_scaled)
-                    rmse_scaled = root_mean_squared_error(y_test, y_pred_scaled)
-                    r2_scaled   = r2_score(y_test, y_pred_scaled)
+                    X_train_mod = X_train
+                    X_test_mod = X_test
 
-                    st.subheader('Scaled Model Coefficients')
-                    coef_df_sc = pd.DataFrame({
-                            "Feature": final_feat,
-                            "Coefficient": lin_reg_scaled.coef_
-                        })
-                    st.dataframe(coef_df_sc, width='stretch', hide_index=True)
-        
-                    st.subheader('Scaled Fit Metrics')
-                    m1, m2, m3 = st.columns(3)
-                    m1.metric('Mean Squared Error', f'{mse_scaled:.4f}')
-                    m2.metric('Root Mean Squared Error', f'{rmse_scaled:.4f}')
-                    m3.metric('R2 Score', f'{r2_scaled:.4f}')
-    else:
-        st.header('Logistic Regression Hyperparameters', divider = 'gray')
+                lin_reg_hyp = LinearRegression(fit_intercept=not toggle3)
+                lin_reg_hyp.fit(X_train_mod, y_train)
+                y_pred_hyp = lin_reg_hyp.predict(X_test_mod)
+                residuals_hyp = y_test - y_pred_hyp
+
+                mse_hyp = mean_squared_error(y_test, y_pred_hyp)
+                rmse_hyp = root_mean_squared_error(y_test, y_pred_hyp)
+                r2_hyp = r2_score(y_test, y_pred_hyp)
+
+                scale_label = "Scaled" if toggle2 else "Unscaled"
+                origin_label = " (Through Origin)" if toggle3 else " (With Intercept)"
+
+                st.subheader(f"{scale_label} Model Coefficients {origin_label}")
+                coef_df_hyp = pd.DataFrame({
+                    "Feature": final_feat,
+                    "Coefficient": lin_reg_hyp.coef_,
+                })
+
+                st.dataframe(coef_df_hyp, width = 'stretch', hide_index = True)
+                st.subheader(f"{scale_label} Fit Metrics {origin_label}")
+                m1, m2, m3 = st.columns(3)
+                m1.metric("Mean Squared Error", f"{mse_hyp:.4f}")
+                m2.metric("Root Mean Squared Error", f"{rmse_hyp:.4f}")
+                m3.metric("R2 Score", f"{r2_hyp:.4f}")
+
+                col_h1, col_h2 = st.columns(2)
+
+                with col_h1:
+                    fig1, ax1 = plt.subplots(figsize=(6, 4.5))
+                    ax1.hist(residuals_hyp, bins=20, edgecolor="black", alpha=0.7)
+                    ax1.set_xlabel("Residuals")
+                    ax1.set_ylabel("Frequency")
+                    ax1.set_title("Histogram of Residuals")
+                    st.pyplot(fig1)
+                    plt.close(fig1)
+
+                with col_h2:
+                    fig2, ax2 = plt.subplots(figsize=(6, 4.5))
+                    qqplot(residuals_hyp, line="s", ax=ax2)
+                    ax2.set_title("Q-Q Plot of Residuals")
+                    st.pyplot(fig2)
+                    plt.close(fig2)
+        elif models == 'Logistic Regression':
+            st.header('Logistic Regression Hyperparameters', divider = 'gray')
+            with st.container(border = True):
+                st.markdown('Select a maximum number of iterations for the logistic regression model, as well as the method for class weight.')
+                max_it = st.slider('Max Iterations', min_value = 0, max_value = 100, value = 50, step = 1)
+                class_weight = st.radio('Class Weight', [None, 'balanced'], horizontal = True)
+                log_reg_hyp = LogisticRegression(max_iter=max_it, class_weight=class_weight)
+                log_reg_hyp.fit(X_train, y_train)
+
+                y_pred_hyp = log_reg_hyp.predict(X_test)
+                accuracy_hyp = accuracy_score(y_test, y_pred_hyp)
+                precision_hyp = precision_score(y_test, y_pred_hyp, average='weighted')
+                recall_hyp = recall_score(y_test, y_pred_hyp, average='weighted')
+                f1_hyp = f1_score(y_test, y_pred_hyp, average='weighted')
+
+                st.subheader('Fit Metrics for Model with Chosen Hyperparameters')
+                m1, m2, m3, m4 = st.columns(4)
+
+                m1.metric('Accuracy', f'{accuracy_hyp:.4f}')
+                m2.metric('Precision', f'{precision_hyp:.4f}')
+                m3.metric('Recall', f'{recall_hyp:.4f}')
+                m4.metric('F1', f'{f1_hyp:.4f}')
+
+                st.subheader('Confusion Matrix for Model with Chosen Hyperparameters')
+
+                cm2 = confusion_matrix(y_test, y_pred_hyp)
+                fig, ax = plt.subplots(figsize=(5,4))
+                sns.heatmap(cm2, annot=True, fmt='d', cmap='Blues')
+                ax.set_xlabel('Predicted')
+                ax.set_ylabel('Actual')
+                ax.set_title('Confusion Matrix')
+                st.pyplot(fig)
