@@ -129,9 +129,12 @@ with tab1:
         else:
             st.header("3. Encoding Categorical Variables", divider = 'gray')
             with st.container(border = True):
-                feat_encode = st.multiselect('Select which features are categorical, but can be numerically encoded',cleaned_df.columns.tolist())
+                feature_options = cleaned_df.columns.drop(target).tolist()
+                feat_encode = st.multiselect('Select which features are categorical, but can be numerically encoded',feature_options)
+                
                 selected_feat = list(dict.fromkeys(num_feat + feat_encode))
                 encoded_df = cleaned_df[selected_feat]
+                
                 encoding_maps = {}
                 for feat in feat_encode:
                     st.markdown(f'**Encoding for {feat}:**')
@@ -146,8 +149,8 @@ with tab1:
                     encoding_maps[feat] = col_map
                     encoded_df[feat] = encoded_df[feat].map(encoding_maps[feat])
 
-                X = encoded_df.drop(columns=[target], errors = 'ignore')
-                y = encoded_df[target]
+                X = encoded_df
+                y = cleaned_df[target]
 
                 st.success(f"**Ready to train!**\n\n"
                            f"* **Target Variable:** {target}\n"
@@ -312,7 +315,7 @@ with tab2:
             st.header('Logistic Regression Hyperparameters', divider = 'gray')
             with st.container(border = True):
                 st.markdown('Select a maximum number of iterations for the logistic regression model, as well as the method for class weight.')
-                max_it = st.slider('Max Iterations', min_value = 0, max_value = 100, value = 50, step = 1)
+                max_it = st.slider('Max Iterations', min_value = 0, max_value = 1000, value = 50, step = 1)
                 class_weight = st.radio('Class Weight', [None, 'balanced'], horizontal = True)
                 log_reg_hyp = LogisticRegression(max_iter=max_it, class_weight=class_weight)
                 log_reg_hyp.fit(X_train, y_train)
