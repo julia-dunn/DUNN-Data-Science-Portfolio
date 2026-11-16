@@ -25,6 +25,16 @@ example_datasets = {
     'Social Media Impact on Live': app_dir / "Social_media_impact_on_life.csv",
     'Titanic': app_dir / "titanic_data.csv"
 }
+
+@st.cache_data
+def load_clean_data(file_source):
+    df = pd.read_csv(file_source)
+    missing_count = df.isna().mean()
+    columns_kept = missing_count[missing_count <= 0.5].index.to_list()
+    columns_dropped = [c for c in df.columns if c not in columns_kept]
+    cleaned = df[columns_kept].dropna()
+    return df, cleaned, columns_dropped
+    
 tab1, tab2 = st.tabs(['Selecting Dataset', 'Building and Evaluating Model'])
 final_feat = []
 
@@ -41,15 +51,9 @@ with tab1:
             selected_example = st.radio('Choose an Example Dataset', list(example_datasets.keys()), horizontal = True)
             file = example_datasets[selected_example]
     if file is not None:
-        dataframe = pd.read_csv(file)
-
-        missing_count = dataframe.isna().mean()
-        columns_kept = missing_count[missing_count <= 0.5].index.to_list()
-        columns_dropped = [c for c in dataframe.columns if c not in columns_kept]
-        working_df = dataframe[columns_kept]
+        dataframe, cleaned_df, columns_dropped = load_clean_data(file)
 
         st.subheader('Dataset Overview')
-        cleaned_df = working_df.dropna()
 
         m1, m2, m3 = st.columns(3)
         m1.metric('Total Rows', f'{len(dataframe):,}')
@@ -195,12 +199,14 @@ with tab2:
                     ax1.set_ylabel('Frequency')
                     ax1.set_title('Histogram of Residuals')
                     st.pyplot(fig1)
+                    plt.close(fig1)
 
                 with col2:
                     fig2, ax2 = plt.subplots(figsize = (6, 4.5))
                     qqplot(residuals_unsc, line ='s', ax=ax2)
                     ax2.set_title('Q-Q Plot of Residuals')
                     st.pyplot(fig2)
+                    plt.close(fig2)
 
     else:
         if target:
@@ -233,6 +239,7 @@ with tab2:
                 ax.set_ylabel('Actual')
                 ax.set_title('Confusion Matrix')
                 st.pyplot(fig)
+                plt.close(fig)
         else:
             st.warning('No target has been selected. Please navigate to the **Selecting Dataset**.')
     if file is not None:        
