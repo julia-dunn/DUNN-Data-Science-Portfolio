@@ -17,7 +17,14 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, precision_score, f1_score, recall_score, confusion_matrix
 from statsmodels.graphics.gofplots import qqplot
 
+from pathlib import Path
 
+app_dir = Path(__file__).parent
+
+example_datasets = {
+    'Social Media Impact on Live': app_dir / "Social_media_impact_on_life.csv",
+    'Titanic': app_dir / "titanic_data.csv"
+}
 tab1, tab2 = st.tabs(['Selecting Dataset', 'Building and Evaluating Model'])
 final_feat = []
 
@@ -31,7 +38,7 @@ with tab1:
         if toggle:
             file = st.file_uploader("Upload your CSV file", type="csv", key = 'user_upload')
         else:
-            file = st.radio('Choose an Example Dataset', ["Social_media_impact_on_life.csv", "titanic_data.csv"], horizontal = True)
+            file = st.radio('Choose an Example Dataset', list(example_datasets.keys()), horizontal = True)
 
     if file is not None:
         dataframe = pd.read_csv(file)
