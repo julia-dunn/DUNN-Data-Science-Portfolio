@@ -151,7 +151,7 @@ with tab1:
                     encoding_maps[feat] = col_map
                     encoded_df[feat] = encoded_df[feat].map(encoding_maps[feat])
 
-                X = encoded_df
+                X = encoded_df.drop(columns=target)
                 y = cleaned_df[target]
 
                 st.success(f"**Ready to train!**\n\n"
@@ -191,10 +191,15 @@ with tab2:
                 st.dataframe(coef_df_unsc, width='stretch', hide_index=True)
 
                 st.subheader('Unscaled Fit Metrics')
-                m1, m2, m3 = st.columns(3)
-                m1.metric('Mean Squared Error', f'{mse_unsc:.4f}')
-                m2.metric('Root Mean Squared Error', f'{rmse_unsc:.4f}')
-                m3.metric('R2 Score', f'{r2_unsc:.4f}')
+                m1, m2 = st.columns(2)
+                m1.metric('Root Mean Squared Error', f'{rmse_unsc:.4f}')
+                m2.metric('R2 Score', f'{r2_unsc:.4f}')
+
+                with st.expander('What do these metrics mean?'):
+                                    st.markdown('**Root Mean Squared Error:** \n\n'
+                                                "The root mean squared error described how much the model's predictions differ from the 'actual' value of the target variable. It takes the sum of the difference between each value and its expected value, then averages that for the number of observations n, then takes the square root. \n\n"
+                                                '**R2 Score:** \n\n'
+                                                'The R2 score (aka the coefficient of determination) essentially describes the extent to which the variance in target variable can be explained by the predictor variables. It is compares the variance of the prediction error to the variance in the dataset as a whole.')
 
                 col1, col2 = st.columns(2)
                 with col1:
@@ -220,8 +225,8 @@ with tab2:
                 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state = 42)
                 scaler = StandardScaler()
                 X_train_scaled = scaler.fit_transform(X_train)
-                X_test_scaled = scaler.fit_transform(X_test)
-                log_reg_default = LogisticRegression()
+                X_test_scaled = scaler.transform(X_test)
+                log_reg_default = LogisticRegression(class_weight=None, max_iter=1000)
                 log_reg_default.fit(X_train_scaled, y_train)
 
                 y_pred_def = log_reg_default.predict(X_test_scaled)
@@ -237,6 +242,16 @@ with tab2:
                 m2.metric('Precision', f'{precision:.4f}')
                 m3.metric('Recall', f'{recall:.4f}')
                 m4.metric('F1', f'{f1:.4f}')
+
+                with st.expander('What do these metrics mean?'):
+                    st.markdown('A**ccuracy:**')
+                    st.markdown('Accuracy represents the percentage of classifications that are correct, including both True Positive and True Negatives, with respect to the toal number of classifications.')
+                    st.markdown('**Precision:**')
+                    st.markdown('Precision indicates the number of correct **positive** classifications out of the total number of positive **classifications**. This is necessary if false positives are relevant in your domain.')
+                    st.markdown('**Recall:**')
+                    st.markdown('Recall indicates the number of correct **positive** classifications out of the total number of **true positive** datapoints. This indicates when positives are missing.')
+                    st.markdown('**F1:**')
+                    st.markdown('The F1 score balances information regarding precision and recall. It is what is called a "balanced mean", two times the product divded by the sum.')
 
                 st.subheader('Confusion Matrix for Default Model')
 
@@ -294,10 +309,15 @@ with tab2:
 
                 st.dataframe(coef_df_hyp, width = 'stretch', hide_index = True)
                 st.subheader(f"{scale_label} Fit Metrics {origin_label}")
-                m1, m2, m3 = st.columns(3)
-                m1.metric("Mean Squared Error", f"{mse_hyp:.4f}")
-                m2.metric("Root Mean Squared Error", f"{rmse_hyp:.4f}")
-                m3.metric("R2 Score", f"{r2_hyp:.4f}")
+                m1, m2 = st.columns(2)
+                m1.metric("Root Mean Squared Error", f"{rmse_hyp:.4f}")
+                m2.metric("R2 Score", f"{r2_hyp:.4f}")
+
+                with st.expander('What do these metrics mean?'):
+                                                    st.markdown('**Root Mean Squared Error:** \n\n'
+                                                                "The root mean squared error described how much the model's predictions differ from the 'actual' value of the target variable. It takes the sum of the difference between each value and its expected value, then averages that for the number of observations n, then takes the square root. \n\n"
+                                                                '**R2 Score:** \n\n'
+                                                                'The R2 score (aka the coefficient of determination) essentially describes the extent to which the variance in target variable can be explained by the predictor variables. It is compares the variance of the prediction error to the variance in the dataset as a whole.')
 
                 col_h1, col_h2 = st.columns(2)
 
@@ -323,9 +343,9 @@ with tab2:
                 max_it = st.slider('Max Iterations', min_value = 0, max_value = 1000, value = 50, step = 1)
                 class_weight = st.radio('Class Weight', [None, 'balanced'], horizontal = True)
                 log_reg_hyp = LogisticRegression(max_iter=max_it, class_weight=class_weight)
-                log_reg_hyp.fit(X_train, y_train)
+                log_reg_hyp.fit(X_train_scaled, y_train)
 
-                y_pred_hyp = log_reg_hyp.predict(X_test)
+                y_pred_hyp = log_reg_hyp.predict(X_test_scaled)
                 accuracy_hyp = accuracy_score(y_test, y_pred_hyp)
                 precision_hyp = precision_score(y_test, y_pred_hyp, average='weighted')
                 recall_hyp = recall_score(y_test, y_pred_hyp, average='weighted')
@@ -338,6 +358,16 @@ with tab2:
                 m2.metric('Precision', f'{precision_hyp:.4f}')
                 m3.metric('Recall', f'{recall_hyp:.4f}')
                 m4.metric('F1', f'{f1_hyp:.4f}')
+
+                with st.expander('What do these metrics mean?'):
+                                    st.markdown('A**ccuracy:**')
+                                    st.markdown('Accuracy represents the percentage of classifications that are correct, including both True Positive and True Negatives, with respect to the toal number of classifications.')
+                                    st.markdown('**Precision:**')
+                                    st.markdown('Precision indicates the number of correct **positive** classifications out of the total number of positive **classifications**. This is necessary if false positives are relevant in your domain.')
+                                    st.markdown('**Recall:**')
+                                    st.markdown('Recall indicates the number of correct **positive** classifications out of the total number of **true positive** datapoints. This indicates when positives are missing.')
+                                    st.markdown('**F1:**')
+                                    st.markdown('The F1 score balances information regarding precision and recall. It is what is called a "balanced mean", two times the product divded by the sum.')
 
                 st.subheader('Confusion Matrix for Model with Chosen Hyperparameters')
 
