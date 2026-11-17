@@ -97,7 +97,7 @@ with tab1:
                     plt.close(fig)
         
             else:
-                target = st.selectbox('Select your categorical **target variable**',cleaned_df.columns.tolist(), help='Tip: For the Titanic dataset, try selecting "survived"')
+                target = st.selectbox('Select your categorical **target variable**',cleaned_df.columns.tolist(), index = None, help='Tip: For the Titanic dataset, try selecting "survived"')
                 if target: 
                     unique_vals = cleaned_df[target].unique()
                     st.markdown(f'**Unique values in {target}:** {unique_vals}')
@@ -109,7 +109,9 @@ with tab1:
                     else:
                         st.warning(f'**Invalid Target:** {target} has {len(unique_vals)} unique values.'
                                    f'Standard Logistic Regression requires a binary target.')
-
+                else:
+                    st.info("Select a target column above to configure features and train the model.")
+                    st.stop()
         if models == 'Linear Regression':
             st.header("3. Linearity Check", divider = 'gray')
             with st.container(border = True):
@@ -216,10 +218,13 @@ with tab2:
             with st.container(border=True):
                 st.caption('In Logistic Regression, we can select for a few different types of hyperparameters. Primarily, we will focus on class weight and the maximum number of iterations. First we will build the default model.')
                 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state = 42)
+                scaler = StandardScaler()
+                X_train_scaled = scaler.fit_transform(X_train)
+                X_test_scaled = scaler.fit_transform(X_test)
                 log_reg_default = LogisticRegression()
-                log_reg_default.fit(X_train, y_train)
+                log_reg_default.fit(X_train_scaled, y_train)
 
-                y_pred_def = log_reg_default.predict(X_test)
+                y_pred_def = log_reg_default.predict(X_test_scaled)
                 accuracy = accuracy_score(y_test, y_pred_def)
                 precision = precision_score(y_test, y_pred_def, average='weighted')
                 recall = recall_score(y_test, y_pred_def, average='weighted')
