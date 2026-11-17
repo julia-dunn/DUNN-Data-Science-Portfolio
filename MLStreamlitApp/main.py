@@ -181,7 +181,7 @@ with tab1:
                     encoded_df[feat] = encoded_df[feat].map(encoding_maps[feat])
 
                 # our final X is the entire encoded df, eliminatin the target, and the final y is the series of the selected target feature from the original cleaned dataframe 
-                X = encoded_df.drop(columns=target)
+                X = encoded_df.drop(columns=[target], errors = 'ignore')
                 y = cleaned_df[target]
 
                 st.success(f"**Ready to train!**\n\n"
