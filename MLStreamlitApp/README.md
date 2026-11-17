@@ -76,7 +76,7 @@ streamlit run main.py
 - Precision: Precision indicates the number of correct positive classifications out of the total number of positive classifications. This is necessary if false positives are relevant in your domain.
 - Recall: Recall indicates the number of correct positive classifications out of the total number of true positive datapoints. This indicates when positives are missing.
 - F1 Score: The F1 score balances information regarding precision and recall. It is what is called a "balanced mean", two times the product divded by the sum.
-- 
+
 #### Hyperparameters: 
 - Max Number of Iterations (between 0 and 1000)
 - Class Weight (None or Balanced)
@@ -87,4 +87,4 @@ streamlit run main.py
 - [Guide to Markdown Syntax for Formatting Streamlit App - citing entire page](https://isom3400-app.streamlit.app/text_elements)
 - [StandardScaler Documentation](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.StandardScaler.html)
 
-## [Working Through App with Examples (Video)]()
+## [Working Through App with Examples (Video)](https://drive.google.com/file/d/1EMR1NZQsKnvHrcITY3Q4eQtGBejyprCs/view?usp=sharing)
