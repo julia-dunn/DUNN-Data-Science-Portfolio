@@ -61,11 +61,30 @@ streamlit run main.py
 ## Models and their Hyperparameters
 
 ### Linear Regression
+#### Metrics
+- Root Mean Squared Error: The root mean squared error described how much the model's predictions differ from the 'actual' value of the target variable. It takes the sum of the difference between each value and its expected value, then averages that for the number of observations n, then takes the square root.
+- R2 Score: The R2 score (aka the coefficient of determination) essentially describes the extent to which the variance in target variable can be explained by the predictor variables. It is compares the variance of the prediction error to the variance in the dataset as a whole.
+
+#### Hyperparameters
+- Scaling (Yes/No)
+- Y-intercept (Yes/No)
 
 ### Logistic Regression
+
+#### Metrics
+- Accuracy: Accuracy represents the percentage of classifications that are correct, including both True Positive and True Negatives, with respect to the toal number of classifications.
+- Precision: Precision indicates the number of correct positive classifications out of the total number of positive classifications. This is necessary if false positives are relevant in your domain.
+- Recall: Recall indicates the number of correct positive classifications out of the total number of true positive datapoints. This indicates when positives are missing.
+- F1 Score: The F1 score balances information regarding precision and recall. It is what is called a "balanced mean", two times the product divded by the sum.
+- 
+#### Hyperparameters: 
+- Max Number of Iterations (between 0 and 1000)
+- Class Weight (None or Balanced)
 
 ## References 
 - [Pathlib documentation](https://docs.python.org/3/library/pathlib.html)
 - [Cache_Data Documentation](https://docs.streamlit.io/develop/api-reference/caching-and-state/st.cache_data)
 - [Guide to Markdown Syntax for Formatting Streamlit App - citing entire page](https://isom3400-app.streamlit.app/text_elements)
 - [StandardScaler Documentation](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.StandardScaler.html)
+
+## [Working Through App with Examples (Video)]()
