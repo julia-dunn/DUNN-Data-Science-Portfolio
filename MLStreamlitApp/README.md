@@ -57,3 +57,14 @@ Once the requirements are installed and imported, the user may then create an in
 ```
 streamlit run main.py
 ```
+
+## Models and their Hyperparameters
+
+### Linear Regression
+
+### Logistic Regression
+
+## References 
+- [Pathlib documentation](https://docs.python.org/3/library/pathlib.html)
+- [Cache_Data Documentation](https://docs.streamlit.io/develop/api-reference/caching-and-state/st.cache_data)
+- [Guide to Markdown Syntax for Formatting Streamlit App - citing entire page](https://isom3400-app.streamlit.app/text_elements)
