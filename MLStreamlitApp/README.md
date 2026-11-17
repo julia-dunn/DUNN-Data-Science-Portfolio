@@ -68,3 +68,4 @@ streamlit run main.py
 - [Pathlib documentation](https://docs.python.org/3/library/pathlib.html)
 - [Cache_Data Documentation](https://docs.streamlit.io/develop/api-reference/caching-and-state/st.cache_data)
 - [Guide to Markdown Syntax for Formatting Streamlit App - citing entire page](https://isom3400-app.streamlit.app/text_elements)
+- [StandardScaler Documentation](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.StandardScaler.html)
